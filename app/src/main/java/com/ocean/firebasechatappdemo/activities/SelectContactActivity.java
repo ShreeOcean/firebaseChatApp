@@ -1,7 +1,8 @@
-package com.ocean.firebasechatappdemo;
+package com.ocean.firebasechatappdemo.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.ocean.firebasechatappdemo.databinding.ActivitySelectContactBinding;
@@ -17,7 +18,7 @@ public class SelectContactActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         binding.linearLayoutAddNewContact.setOnClickListener(view -> {
-
+            startActivity(new Intent(SelectContactActivity.this, AddNewContactActivity.class));
         });
     }
 }

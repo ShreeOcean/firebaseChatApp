@@ -1,4 +1,4 @@
-package com.ocean.firebasechatappdemo;
+package com.ocean.firebasechatappdemo.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 

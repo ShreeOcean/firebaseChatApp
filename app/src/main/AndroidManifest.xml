@@ -4,6 +4,10 @@
     package="com.ocean.firebasechatappdemo">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+
 
     <application
         android:allowBackup="true"
@@ -16,16 +20,10 @@
         android:theme="@style/Theme.FireBaseChatAppDemo"
         tools:targetApi="31">
         <activity
-            android:name=".AddNewContactActivity"
-            android:exported="false"/>
-        <activity
-            android:name=".ChatRoomActivity"
+            android:name=".activities.SubmitDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".SelectContactActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HomeActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,6 +31,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.AddNewContactActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ChatRoomActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SelectContactActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.HomeActivity"
+            android:exported="false"></activity>
     </application>
 
 </manifest>
