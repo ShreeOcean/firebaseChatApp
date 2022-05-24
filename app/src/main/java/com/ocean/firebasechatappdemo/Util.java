@@ -19,6 +19,7 @@ public class Util {
         bitmap.compress(Bitmap.CompressFormat.PNG,80,byteArrayOutputStream);
         byte[] b = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(b, Base64.DEFAULT);
+
     }
 
     public static String convertBitmaptoBase64(Bitmap bitmap){

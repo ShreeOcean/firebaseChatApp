@@ -28,10 +28,9 @@ android {
     }
     buildFeatures {
         viewBinding true
-    }
-    buildFeatures{
         dataBinding true
     }
+
 }
 
 dependencies {
@@ -48,14 +47,22 @@ dependencies {
 
     // Declare the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.firebase:firebase-database'
+
+    implementation 'com.google.firebase:firebase-auth:21.0.3'
+    implementation 'com.google.firebase:firebase-database:20.0.4'
     //Google Play services dependency for the Google Pay API
-    implementation 'com.google.android.gms:play-services-safetynet'
+    implementation 'com.google.android.gms:play-services-auth:20.1.0'
     //firebase analytics
     implementation 'com.google.firebase:firebase-analytics:21.0.0'
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+    implementation 'com.google.firebase:firebase-firestore:24.1.2'
+
 
     //circle image view implementation
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //lombok dependency
+    compileOnly "org.projectlombok:lombok:1.18.24"
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
 }

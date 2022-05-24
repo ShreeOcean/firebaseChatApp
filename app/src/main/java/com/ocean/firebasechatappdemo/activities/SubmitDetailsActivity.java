@@ -17,16 +17,27 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.ocean.firebasechatappdemo.FirebaseCommonDB;
+import com.ocean.firebasechatappdemo.FirebaseDB;
 import com.ocean.firebasechatappdemo.R;
+import com.ocean.firebasechatappdemo.SessionManager;
 import com.ocean.firebasechatappdemo.Util;
 import com.ocean.firebasechatappdemo.databinding.ActivitySubmitDetailsBinding;
+import com.ocean.firebasechatappdemo.model.UserModel;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class SubmitDetailsActivity extends AppCompatActivity implements View.OnClickListener {
@@ -36,9 +47,14 @@ public class SubmitDetailsActivity extends AppCompatActivity implements View.OnC
     private FirebaseAuth firebaseAuth;
     private String imageInBase64;
     private boolean isUpdate = false;
-    private String sender_name, sender_phone_num, sender_email, sender_job_status;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     private Bitmap bitmap;
+    private SessionManager sessionManager;
+    UserModel userModel;
+    String TAG = "SUBMITDETAILSACTIVITY";
+    String userName,userPhoneNum,userEmail,userJobStatus,userImage,userID,contactList;
+    private FirebaseFirestore firestoreDB;
+
 
 
     @Override
@@ -46,14 +62,21 @@ public class SubmitDetailsActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         binding = ActivitySubmitDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        userModel = new UserModel();
         firebaseAuth = FirebaseAuth.getInstance();
+        firestoreDB = FirebaseFirestore.getInstance();
+        sessionManager = new SessionManager(getApplicationContext());
 
 //        if (firebaseAuth.getCurrentUser() != null){ //TODO: logged in session without shared preference, that is inbuilt firebase logged in session
 //
 //            startActivity(new Intent(SubmitDetailsActivity.this, HomeActivity.class));
 //            finish();
 //        }
+        if (sessionManager.notLoggedIn()){
+            sessionManager.loggedIn();
+            startActivity(new Intent(SubmitDetailsActivity.this, HomeActivity.class));
+            finish();
+        }
 
         binding.btnCaptureImage.setOnClickListener(this);
         binding.btnSubmitDetails.setOnClickListener(this);
@@ -68,6 +91,54 @@ public class SubmitDetailsActivity extends AppCompatActivity implements View.OnC
 
                 //TODO: verify edit text, verify logged in phone no is same as input sender's phone no., submit_details is creating sender_user in firestore.
                 validationOfEditText();
+
+                //CollectionReference collectionReference = firestoreDB.collection("userList");
+
+                userModel.setUserName(Objects.requireNonNull(binding.etSenderName.getText().toString()));
+                userModel.setUserEmail(Objects.requireNonNull(binding.etSenderEmail.getText().toString()));
+                userModel.setUserJobStatus(Objects.requireNonNull(binding.etSenderJobStatus.getText().toString()));
+                userModel.setUserImage(Objects.requireNonNull(Util.convertImageToString(binding.submitSendersProfileImage)));
+                userModel.setUserPhoneNum(Objects.requireNonNull(binding.etSenderPhoneNum.getText().toString()));
+
+//                collectionReference.add(userModel).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                    @Override
+//                    public void onSuccess(DocumentReference documentReference) {
+//
+//                        Log.d(TAG, "onSuccess: " + documentReference);
+//                        Toast.makeText(SubmitDetailsActivity.this, "Submitted Successfully", Toast.LENGTH_SHORT).show();
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//
+//                        Log.d(TAG, "onFailure: " + e);
+//                        Toast.makeText(SubmitDetailsActivity.this, "Failed to submit, Please try later" + e, Toast.LENGTH_SHORT).show();
+//
+//                    }
+//                });
+                firestoreDB.collection("users").add(userModel)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+
+                                Log.d(TAG, "onSuccess: " + documentReference);
+                                Toast.makeText(SubmitDetailsActivity.this, "Submitted Successfully", Toast.LENGTH_SHORT).show();
+                                sessionManager.loggedIn();
+                                startActivity(new Intent(SubmitDetailsActivity.this, HomeActivity.class));
+                                finish();
+//
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                                Log.d(TAG, "onFailure: " + e);
+                                Toast.makeText(SubmitDetailsActivity.this, "Failed to submit, Please try later" + e, Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+
+
                 break;
 
             case R.id.btnCaptureImage:
@@ -178,6 +249,10 @@ public class SubmitDetailsActivity extends AppCompatActivity implements View.OnC
         if (TextUtils.isEmpty(binding.etSenderJobStatus.getText().toString())){
             binding.etSenderJobStatus.setError("Job status is empty !!!");
         }
+
+//        if ("+91" +binding.etSenderPhoneNum.getText().toString() != sessionManager.getUserPhoneNum()){
+//            Toast.makeText(this, "Logged-In phone number does not match with above given number...", Toast.LENGTH_SHORT).show();
+//        }
 
     }
 }

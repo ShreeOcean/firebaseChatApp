@@ -21,6 +21,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.ocean.firebasechatappdemo.R;
+import com.ocean.firebasechatappdemo.SessionManager;
 import com.ocean.firebasechatappdemo.databinding.ActivityLoginBinding;
 
 import java.util.concurrent.TimeUnit;
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private String verificationId;
     private String phone;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +46,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         binding.btnGetOtp.setOnClickListener(this);
         binding.btnVerifyOtp.setOnClickListener(this);
 
+        sessionManager = new SessionManager(getApplicationContext());
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        if (firebaseAuth.getCurrentUser() != null){ //TODO: logged in session without shared preference, that is inbuilt firebase logged in session
-
+//        if (firebaseAuth.getCurrentUser() != null){ //TODO: inbuilt firebase logged in session
+//
+//            startActivity(new Intent(LoginActivity.this, SubmitDetailsActivity.class));
+//            finish();
+//        }
+        if (sessionManager.notLoggedIn()){
+            sessionManager.loggedIn();
             startActivity(new Intent(LoginActivity.this, SubmitDetailsActivity.class));
             finish();
         }
@@ -106,8 +114,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onComplete(@NonNull Task<AuthResult> task) {
 
                 if (task.isSuccessful()){
+
+                    sessionManager.setUserPhoneNum(phone);
                     startActivity(new Intent(LoginActivity.this, SubmitDetailsActivity.class));
                     finish();
+
                 }else {
                     Toast.makeText(LoginActivity.this,task.getException().getMessage(),Toast.LENGTH_SHORT).show();
                 }
